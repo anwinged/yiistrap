@@ -1034,7 +1034,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
     protected static function awesomeInput($name, $checked, $htmlOptions, $radio)
     {
         $label = TbArray::popValue('label', $htmlOptions, false);
-        if ($label !== false && !TbArray::getValue('id', $htmlOptions)) {
+        if (!TbArray::getValue('id', $htmlOptions)) {
             if ($name) {
                 $htmlOptions['id'] = parent::getIdByName($name);
             } else {
@@ -2062,11 +2062,9 @@ EOD;
     protected static function activeAwesomeInput($model, $attribute, $htmlOptions, $radio)
     {
         $label = TbArray::popValue('label', $htmlOptions, false);
-        if ($label !== false) {
-            parent::resolveNameID($model,$attribute,$htmlOptions);
-            if (!TbArray::getValue('id', $htmlOptions)) {
-                $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
-            }
+        parent::resolveNameID($model,$attribute,$htmlOptions);
+        if (!TbArray::getValue('id', $htmlOptions)) {
+            $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
         }
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $containerOptions = self::extractAwesomeContainerOptions($htmlOptions, $radio);
@@ -2082,12 +2080,11 @@ EOD;
 
     protected static function createAwesomeCheckBoxAndRadioButtonLabel($label, $input, $htmlOptions, $labelOptions)
     {
-        //Label is essential for awesomebc, but 'for' is not required for empty labels
+        //Label is essential for awesomebc
         if ($label === false) {
             $label = '';
-        } else {
-            TbArray::defaultValue('for', $htmlOptions['id'], $labelOptions);
         }
+        TbArray::defaultValue('for', $htmlOptions['id'], $labelOptions);
         return $input.self::tag('label', $labelOptions, $label);
     }
 
