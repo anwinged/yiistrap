@@ -1035,6 +1035,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
     {
         $label = TbArray::popValue('label', $htmlOptions, false);
         if ($label !== false) {
+            $htmlOptions['id'] = $name;
             self::resolveAwesomeId($htmlOptions);
         }
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
@@ -2045,7 +2046,7 @@ EOD;
 
     protected static function resolveAwesomeId(&$htmlOptions)
     {
-        if (!isset($htmlOptions['id'])) {
+        if (!TbArray::getValue('id', $htmlOptions)) {
             $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
         }
     }
