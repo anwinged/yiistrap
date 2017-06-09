@@ -984,11 +984,15 @@ class TbHtml extends CHtml // required in order to access the protected methods 
      */
     public static function radioButton($name, $checked = false, $htmlOptions = array())
     {
+        $container = TbArray::popValue('useContainer', $htmlOptions, false);
+        if (TbArray::popValue('awesome', $htmlOptions, true)) {
+            return self::awesomeInput($name, $checked, $htmlOptions, true);
+        }
         $label = TbArray::popValue('label', $htmlOptions, false);
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $input = parent::radioButton($name, $checked, $htmlOptions);
         // todo: refactor to make a single call to createCheckBoxAndRadioButtonLabel
-        if (TbArray::popValue('useContainer', $htmlOptions, false)) {
+        if ($container) {
             return self::tag(
                 'div',
                 array('class' => 'radio'),
@@ -1008,11 +1012,15 @@ class TbHtml extends CHtml // required in order to access the protected methods 
      */
     public static function checkBox($name, $checked = false, $htmlOptions = array())
     {
+        $container = TbArray::popValue('useContainer', $htmlOptions, false);
+        if (TbArray::popValue('awesome', $htmlOptions, true)) {
+            return self::awesomeInput($name, $checked, $htmlOptions, false);
+        }
         $label = TbArray::popValue('label', $htmlOptions, false);
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $input = parent::checkBox($name, $checked, $htmlOptions);
         // todo: refactor to make a single call to createCheckBoxAndRadioButtonLabel
-        if (TbArray::popValue('useContainer', $htmlOptions, false)) {
+        if ($container) {
             return self::tag(
                 'div',
                 array('class' => 'checkbox'),
@@ -1021,6 +1029,24 @@ class TbHtml extends CHtml // required in order to access the protected methods 
         } else {
             return self::createCheckBoxAndRadioButtonLabel($label, $input, $labelOptions);
         }
+    }
+
+    protected static function awesomeInput($name, $checked, $htmlOptions, $radio)
+    {
+        $label = TbArray::popValue('label', $htmlOptions, false);
+        if ($label !== false) {
+            self::resolveAwesomeId($htmlOptions);
+        }
+        $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
+        $containerOptions = self::extractAwesomeContainerOptions($htmlOptions, $radio);
+        $input = $radio ?
+            parent::radioButton($name, $checked, $htmlOptions) :
+            parent::checkBox($name, $checked, $htmlOptions);
+        return self::tag(
+            'div',
+            $containerOptions,
+            self::createAwesomeCheckBoxAndRadioButtonLabel($label, $input, $htmlOptions, $labelOptions)
+        );
     }
 
     /**
@@ -1922,10 +1948,14 @@ EOD;
      */
     public static function activeRadioButton($model, $attribute, $htmlOptions = array())
     {
+        $container = TbArray::popValue('useContainer', $htmlOptions, false);
+        if (TbArray::popValue('awesome', $htmlOptions, true)) {
+            return self::activeAwesomeInput($model, $attribute, $htmlOptions, true);
+        }
         $label = TbArray::popValue('label', $htmlOptions, false);
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $input = parent::activeRadioButton($model, $attribute, $htmlOptions);
-        if (TbArray::popValue('useContainer', $htmlOptions, false)) {
+        if ($container) {
             return self::tag(
                 'div',
                 array('class' => 'radio'),
@@ -1946,10 +1976,14 @@ EOD;
      */
     public static function activeCheckBox($model, $attribute, $htmlOptions = array())
     {
+        $container = TbArray::popValue('useContainer', $htmlOptions, false);
+        if (TbArray::popValue('awesome', $htmlOptions, true)) {
+            return self::activeAwesomeInput($model, $attribute, $htmlOptions, false);
+        }
         $label = TbArray::popValue('label', $htmlOptions, false);
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $input = parent::activeCheckBox($model, $attribute, $htmlOptions);
-        if (TbArray::popValue('useContainer', $htmlOptions, false)) {
+        if ($container) {
             return self::tag(
                 'div',
                 array('class' => 'checkbox'),
@@ -1988,6 +2022,55 @@ EOD;
         } else {
             return array('', $parts[0]);
         }
+    }
+
+    protected static function activeAwesomeInput($model, $attribute, $htmlOptions, $radio)
+    {
+        $label = TbArray::popValue('label', $htmlOptions, false);
+        if ($label !== false) {
+            parent::resolveNameID($model,$attribute,$htmlOptions);
+            self::resolveAwesomeId($htmlOptions);
+        }
+        $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
+        $containerOptions = self::extractAwesomeContainerOptions($htmlOptions, $radio);
+        $input = $radio ?
+            parent::activeRadioButton($model, $attribute, $htmlOptions) :
+            parent::activeCheckBox($model, $attribute, $htmlOptions);
+        return self::tag(
+            'div',
+            $containerOptions,
+            self::createAwesomeCheckBoxAndRadioButtonLabel($label, $input, $htmlOptions, $labelOptions)
+        );
+    }
+
+    protected static function resolveAwesomeId(&$htmlOptions)
+    {
+        if (!isset($htmlOptions['id'])) {
+            $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
+        }
+    }
+
+    protected static function createAwesomeCheckBoxAndRadioButtonLabel($label, $input, $htmlOptions, $labelOptions)
+    {
+        //Label is essential for awesomebc, but 'for' is not required for empty labels
+        if ($label === false) {
+            $label = '';
+        } else {
+            TbArray::defaultValue('for', $htmlOptions['id'], $labelOptions);
+        }
+        return $input.self::tag('label', $labelOptions, $label);
+    }
+
+    protected static function extractAwesomeContainerOptions(&$htmlOptions, $radio)
+    {
+        $containerOptions = TbArray::popValue('containerOptions', $htmlOptions);
+        $containerClass = $radio ? 'radio' : 'checkbox';
+        self::addCssClass($containerOptions, $containerClass);
+        $color = TbArray::popValue('color', $htmlOptions, self::BUTTON_COLOR_DEFAULT);
+        if (!empty($color)) {
+            self::addCssClass($containerClass . '-' . $color, $containerOptions);
+        }
+        return $containerOptions;
     }
 
     /**
@@ -2427,7 +2510,11 @@ EOD;
      */
     public static function activeControlGroup($type, $model, $attribute, $htmlOptions = array(), $data = array())
     {
+        $controlColor = TbArray::popValue('controlColor', $htmlOptions);
         $color = TbArray::popValue('color', $htmlOptions);
+        if ($controlColor !== null) {
+            $htmlOptions['color'] = $controlColor;
+        }
         $groupOptions = TbArray::popValue('groupOptions', $htmlOptions, array());
         $controlOptions = TbArray::popValue('controlOptions', $htmlOptions, array());
         $label = TbArray::popValue('label', $htmlOptions);

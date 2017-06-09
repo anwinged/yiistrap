@@ -752,6 +752,10 @@ class TbActiveForm extends CActiveForm
      */
     protected function processControlGroupOptions($model, $attribute, $options)
     {
+        $color = TbArray::popValue('color', $options);
+        if (!empty($color)) {
+            $options['controlColor'] = $color;
+        }
         $errorOptions = TbArray::popValue('errorOptions', $options, array());
         $enableAjaxValidation = TbArray::popValue('enableAjaxValidation', $errorOptions, true);
         $enableClientValidation = TbArray::popValue('enableClientValidation', $errorOptions, true);
