@@ -2065,7 +2065,7 @@ EOD;
     {
         $containerOptions = TbArray::popValue('containerOptions', $htmlOptions);
         $containerClass = $radio ? 'radio' : 'checkbox';
-        self::addCssClass($containerOptions, $containerClass);
+        self::addCssClass($containerClass, $containerOptions);
         $color = TbArray::popValue('color', $htmlOptions, self::BUTTON_COLOR_DEFAULT);
         if (!empty($color)) {
             self::addCssClass($containerClass . '-' . $color, $containerOptions);
