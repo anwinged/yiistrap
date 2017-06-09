@@ -1155,7 +1155,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             TbArray::defaultValue('id', $baseID . '_' . $id++, $currentOptions);
             if ($awesome || $inline) {
                 if ($awesome && $inline) {
-                    self::addCssClass($currentOptions, 'radio-inline');
+                    self::addCssClass('radio-inline', $currentOptions);
                 }
                 $currentOptions['label'] = $label;
                 $currentOptions['labelOptions'] = $labelOptions;
@@ -1237,7 +1237,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             TbArray::defaultValue('id', $baseID . '_' . $id++, $currentOptions);
             if ($awesome || $inline) {
                 if ($awesome && $inline) {
-                    self::addCssClass($currentOptions, 'checkbox-inline');
+                    self::addCssClass('checkbox-inline', $currentOptions);
                 }
                 $currentOptions['label'] = $label;
                 $currentOptions['labelOptions'] = $labelOptions;
@@ -1262,7 +1262,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             $currentOptions['label'] = $checkAllLabel;
             $currentOptions['labelOptions'] = $labelOptions;
             if ($awesome && $inline) {
-                self::addCssClass($currentOptions, 'checkbox-inline');
+                self::addCssClass('checkbox-inline', $currentOptions);
             }
             $item = self::checkBox($id, $checkAll, $currentOptions);
             if (!$awesome && !$inline) {
