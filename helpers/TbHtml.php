@@ -1132,31 +1132,31 @@ class TbHtml extends CHtml // required in order to access the protected methods 
         $container = TbArray::popValue('container', $htmlOptions, 'div');
         $containerOptions = TbArray::popValue('containerOptions', $htmlOptions, array());
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
+        if ($inline && !$awesome) {
+            self::addCssClass('radio-inline', $labelOptions);
+        }
         $empty = TbArray::popValue('empty', $htmlOptions);
         if (isset($empty)) {
             $empty = !is_array($empty) ? array('' => $empty) : $empty;
             $data = TbArray::merge($empty, $data);
         }
+        $options = TbArray::popValue('options', $htmlOptions, array());
 
         $items = array();
         $baseID = $containerOptions['id'] = TbArray::popValue('baseID', $htmlOptions, parent::getIdByName($name));
 
         $id = 0;
         foreach ($data as $value => $label) {
+            $currentOptions = TbArray::merge($htmlOptions, TbArray::getValue($value, $options, array()));
             $checked = !strcmp($value, $select);
-            $htmlOptions['value'] = $value;
-            $htmlOptions['id'] = $baseID . '_' . $id++;
-            if ($awesome) {
-                $htmlOptions['label'] = $label;
-                $htmlOptions['labelOptions'] = $labelOptions;
-                $items[] = self::radioButton($name, $checked, $htmlOptions);
-            } elseif ($inline) {
-                $htmlOptions['label'] = $label;
-                self::addCssClass('radio-inline', $labelOptions);
-                $htmlOptions['labelOptions'] = $labelOptions;
-                $items[] = self::radioButton($name, $checked, $htmlOptions);
+            TbArray::defaultValue('value', $value, $currentOptions);
+            TbArray::defaultValue('id', $baseID . '_' . $id++, $currentOptions);
+            if ($awesome || $inline) {
+                TbArray::defaultValue('label', $label, $currentOptions);
+                TbArray::defaultValue('labelOptions', $labelOptions, $currentOptions);
+                $items[] = self::radioButton($name, $checked, $currentOptions);
             } else {
-                $option = self::radioButton($name, $checked, $htmlOptions);
+                $option = self::radioButton($name, $checked, $currentOptions);
                 $items[] = self::tag(
                     'div',
                     array('class' => 'radio'),
@@ -1198,8 +1198,12 @@ class TbHtml extends CHtml // required in order to access the protected methods 
         $separator = TbArray::popValue('separator', $htmlOptions, ' ');
         $container = TbArray::popValue('container', $htmlOptions, 'div');
         $containerOptions = TbArray::popValue('containerOptions', $htmlOptions, array());
+        $options = TbArray::popValue('options', $htmlOptions, array());
 
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
+        if ($inline && !$awesome) {
+            self::addCssClass('checkbox-inline', $labelOptions);
+        }
 
         if (substr($name, -2) !== '[]') {
             $name .= '[]';
@@ -1207,6 +1211,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
 
         $checkAll = TbArray::popValue('checkAll', $htmlOptions);
         $checkAllLast = TbArray::popValue('checkAllLast', $htmlOptions);
+        $checkAllOptions = TbArray::popValue('checkAllOptions', $htmlOptions);
         if ($checkAll !== null) {
             $checkAllLabel = $checkAll;
             $checkAllLast = $checkAllLast !== null;
@@ -1218,21 +1223,17 @@ class TbHtml extends CHtml // required in order to access the protected methods 
         $checkAll = true;
 
         foreach ($data as $value => $label) {
+            $currentOptions = TbArray::merge($htmlOptions, TbArray::getValue($value, $options, array()));
             $checked = !is_array($select) && !strcmp($value, $select) || is_array($select) && in_array($value, $select);
             $checkAll = $checkAll && $checked;
-            $htmlOptions['value'] = $value;
-            $htmlOptions['id'] = $baseID . '_' . $id++;
-            if ($awesome) {
-                $htmlOptions['label'] = $label;
-                $htmlOptions['labelOptions'] = $labelOptions;
-                $items[] = self::checkBox($name, $checked, $htmlOptions);
-            } elseif ($inline) {
-                $htmlOptions['label'] = $label;
-                self::addCssClass('checkbox-inline', $labelOptions);
-                $htmlOptions['labelOptions'] = $labelOptions;
-                $items[] = self::checkBox($name, $checked, $htmlOptions);
+            TbArray::defaultValue('value', $value, $currentOptions);
+            TbArray::defaultValue('id', $baseID . '_' . $id++, $currentOptions);
+            if ($awesome || $inline) {
+                TbArray::defaultValue('label', $label, $currentOptions);
+                TbArray::defaultValue('labelOptions', $labelOptions, $currentOptions);
+                $items[] = self::checkBox($name, $checked, $currentOptions);
             } else {
-                $option = self::checkBox($name, $checked, $htmlOptions);
+                $option = self::checkBox($name, $checked, $currentOptions);
                 $items[] = self::tag(
                     'div',
                     array('class' => 'checkbox'),
@@ -1242,15 +1243,14 @@ class TbHtml extends CHtml // required in order to access the protected methods 
         }
 
         if (isset($checkAllLabel)) {
-            $htmlOptions['value'] = 1;
-            $htmlOptions['id'] = $id = $baseID . '_all';
-            $htmlOptions['label'] = $checkAllLabel;
-            $htmlOptions['labelOptions'] = $labelOptions;
-            $item = self::checkBox($id, $checkAll, $htmlOptions);
-            if ($inline) {
-                self::addCssClass('checkbox-inline', $labelOptions);
-            } else {
-                $item = self::checkBox($id, $checkAll, $htmlOptions);
+            $currentOptions = TbArray::merge($htmlOptions, $checkAllOptions);
+            TbArray::defaultValue('value', 1, $currentOptions);
+            $id = $baseID . '_all';
+            TbArray::defaultValue('id', $id, $currentOptions);
+            TbArray::defaultValue('label', $checkAllLabel, $currentOptions);
+            TbArray::defaultValue('labelOptions', $labelOptions, $currentOptions);
+            $item = self::checkBox($id, $checkAll, $currentOptions);
+            if (!$awesome && !$inline) {
                 $item = self::tag(
                     'div',
                     array('class' => 'checkbox'),
