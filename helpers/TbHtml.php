@@ -1034,9 +1034,12 @@ class TbHtml extends CHtml // required in order to access the protected methods 
     protected static function awesomeInput($name, $checked, $htmlOptions, $radio)
     {
         $label = TbArray::popValue('label', $htmlOptions, false);
-        if ($label !== false) {
-            $htmlOptions['id'] = $name;
-            self::resolveAwesomeId($htmlOptions);
+        if ($label !== false && !TbArray::getValue('id', $htmlOptions)) {
+            if ($name) {
+                $htmlOptions['id'] = parent::getIdByName($name);
+            } else {
+                $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
+            }
         }
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $containerOptions = self::extractAwesomeContainerOptions($htmlOptions, $radio);
@@ -1124,6 +1127,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
     public static function radioButtonList($name, $select, $data, $htmlOptions = array())
     {
         $inline = TbArray::popValue('inline', $htmlOptions, false);
+        $awesome = TbArray::popValue('awesome', $htmlOptions, true);
         $separator = TbArray::popValue('separator', $htmlOptions, ' ');
         $container = TbArray::popValue('container', $htmlOptions, 'div');
         $containerOptions = TbArray::popValue('containerOptions', $htmlOptions, array());
@@ -1142,7 +1146,11 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             $checked = !strcmp($value, $select);
             $htmlOptions['value'] = $value;
             $htmlOptions['id'] = $baseID . '_' . $id++;
-            if ($inline) {
+            if ($awesome) {
+                $htmlOptions['label'] = $label;
+                $htmlOptions['labelOptions'] = $labelOptions;
+                $items[] = self::radioButton($name, $checked, $htmlOptions);
+            } elseif ($inline) {
                 $htmlOptions['label'] = $label;
                 self::addCssClass('radio-inline', $labelOptions);
                 $htmlOptions['labelOptions'] = $labelOptions;
@@ -1186,6 +1194,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
     public static function checkBoxList($name, $select, $data, $htmlOptions = array())
     {
         $inline = TbArray::popValue('inline', $htmlOptions, false);
+        $awesome = TbArray::popValue('awesome', $htmlOptions, true);
         $separator = TbArray::popValue('separator', $htmlOptions, ' ');
         $container = TbArray::popValue('container', $htmlOptions, 'div');
         $containerOptions = TbArray::popValue('containerOptions', $htmlOptions, array());
@@ -1213,7 +1222,11 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             $checkAll = $checkAll && $checked;
             $htmlOptions['value'] = $value;
             $htmlOptions['id'] = $baseID . '_' . $id++;
-            if ($inline) {
+            if ($awesome) {
+                $htmlOptions['label'] = $label;
+                $htmlOptions['labelOptions'] = $labelOptions;
+                $items[] = self::checkBox($name, $checked, $htmlOptions);
+            } elseif ($inline) {
                 $htmlOptions['label'] = $label;
                 self::addCssClass('checkbox-inline', $labelOptions);
                 $htmlOptions['labelOptions'] = $labelOptions;
@@ -2030,7 +2043,9 @@ EOD;
         $label = TbArray::popValue('label', $htmlOptions, false);
         if ($label !== false) {
             parent::resolveNameID($model,$attribute,$htmlOptions);
-            self::resolveAwesomeId($htmlOptions);
+            if (!TbArray::getValue('id', $htmlOptions)) {
+                $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
+            }
         }
         $labelOptions = TbArray::popValue('labelOptions', $htmlOptions, array());
         $containerOptions = self::extractAwesomeContainerOptions($htmlOptions, $radio);
@@ -2042,13 +2057,6 @@ EOD;
             $containerOptions,
             self::createAwesomeCheckBoxAndRadioButtonLabel($label, $input, $htmlOptions, $labelOptions)
         );
-    }
-
-    protected static function resolveAwesomeId(&$htmlOptions)
-    {
-        if (!TbArray::getValue('id', $htmlOptions)) {
-            $htmlOptions['id'] = parent::ID_PREFIX . parent::$count++;
-        }
     }
 
     protected static function createAwesomeCheckBoxAndRadioButtonLabel($label, $input, $htmlOptions, $labelOptions)
