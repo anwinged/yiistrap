@@ -1155,7 +1155,9 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             TbArray::defaultValue('id', $baseID . '_' . $id++, $currentOptions);
             if ($awesome || $inline) {
                 if ($awesome && $inline) {
-                    self::addCssClass('radio-inline', $currentOptions);
+                    $currentContainerOptions = TbArray::popValue('containerOptions', $currentOptions, array());
+                    self::addCssClass('radio-inline', $currentContainerOptions);
+                    $currentOptions['containerOptions'] = $currentContainerOptions;
                 }
                 $currentOptions['label'] = $label;
                 $currentOptions['labelOptions'] = $labelOptions;
@@ -1237,7 +1239,9 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             TbArray::defaultValue('id', $baseID . '_' . $id++, $currentOptions);
             if ($awesome || $inline) {
                 if ($awesome && $inline) {
-                    self::addCssClass('checkbox-inline', $currentOptions);
+                    $currentContainerOptions = TbArray::popValue('containerOptions', $currentOptions, array());
+                    self::addCssClass('checkbox-inline', $currentContainerOptions);
+                    $currentOptions['containerOptions'] = $currentContainerOptions;
                 }
                 $currentOptions['label'] = $label;
                 $currentOptions['labelOptions'] = $labelOptions;
@@ -1262,7 +1266,9 @@ class TbHtml extends CHtml // required in order to access the protected methods 
             $currentOptions['label'] = $checkAllLabel;
             $currentOptions['labelOptions'] = $labelOptions;
             if ($awesome && $inline) {
-                self::addCssClass('checkbox-inline', $currentOptions);
+                $currentContainerOptions = TbArray::popValue('containerOptions', $currentOptions, array());
+                self::addCssClass('checkbox-inline', $currentContainerOptions);
+                $currentOptions['containerOptions'] = $currentContainerOptions;
             }
             $item = self::checkBox($id, $checkAll, $currentOptions);
             if (!$awesome && !$inline) {
