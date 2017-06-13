@@ -1224,6 +1224,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
         if ($checkAll !== null) {
             $checkAllLabel = $checkAll;
             $checkAllLast = $checkAllLast !== null;
+            TbArray::defaultValue('color', self::BUTTON_COLOR_PRIMARY, $checkAllOptions);
         }
 
         $items = array();
