@@ -1220,7 +1220,7 @@ class TbHtml extends CHtml // required in order to access the protected methods 
 
         $checkAll = TbArray::popValue('checkAll', $htmlOptions);
         $checkAllLast = TbArray::popValue('checkAllLast', $htmlOptions);
-        $checkAllOptions = TbArray::popValue('checkAllOptions', $htmlOptions);
+        $checkAllOptions = TbArray::popValue('checkAllOptions', $htmlOptions, []);
         if ($checkAll !== null) {
             $checkAllLabel = $checkAll;
             $checkAllLast = $checkAllLast !== null;
